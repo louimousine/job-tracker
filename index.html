@@ -346,11 +346,28 @@
 (function () {
   "use strict";
 
+  // ---------------------------------------------------------------
+  // Fill these in and every device that opens this page picks them up.
+  // The repo is public, so putting the URL here is fine but the TOKEN is
+  // readable by anyone who finds the repo. Leave DEFAULT_TOKEN empty unless
+  // the repo is private.
+  // ---------------------------------------------------------------
+  var DEFAULT_SYNC_URL = "";
+  var DEFAULT_TOKEN = "";
+
   var LKEY = "tracker:applications";  // local cache
   var BKEY = "tracker:lastbackup";
   var AKEY = "tracker:apikey";
   var SKEY = "tracker:sync";          // { url, token }
-  var GEMINI_MODEL = "gemini-2.5-flash";
+  // Tried in order. Google retires models fairly often, so the first one that
+  // answers gets remembered and used from then on.
+  var GEMINI_MODELS = [
+    "gemini-3.6-flash",
+    "gemini-3.7-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-2.5-flash"
+  ];
+  var MKEY = "tracker:geminimodel";
 
   var STATUSES = ["Saved", "Applied", "Screening", "Interview", "Offer", "Rejected"];
   var ROUTES = ["Cold application", "Referral", "Recruiter reached out", "Campus"];
@@ -367,6 +384,7 @@
   var items = [];
   var lastBackup = null;
   var syncState = "off"; // off, ok, bad
+  var dirty = false;     // a local change that has not reached the sheet
   var filter = "All";
   var query = "";
   var openId = null;
@@ -402,7 +420,11 @@
   }
 
   function syncConf() {
-    try { return JSON.parse(local(SKEY) || "null") || null; } catch (e) { return null; }
+    var saved = null;
+    try { saved = JSON.parse(local(SKEY) || "null"); } catch (e) {}
+    var url = (saved && saved.url) || DEFAULT_SYNC_URL;
+    var token = (saved && saved.token) || DEFAULT_TOKEN;
+    return url ? { url: url, token: token } : null;
   }
 
   function apiKey() { return local(AKEY) || ""; }
@@ -471,6 +493,38 @@
     return changed;
   }
 
+  function pullRemote(quiet) {
+    var conf = syncConf();
+    if (!conf || !conf.url) { syncState = "off"; render(); return Promise.resolve(); }
+
+    return fetch(conf.url + "?token=" + encodeURIComponent(conf.token || "") + "&t=" + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        var next = Array.isArray(data.entries) ? data.entries : [];
+        var fixed = tidy(next);
+        var before = JSON.stringify(items);
+
+        items = next;
+        local(LKEY, JSON.stringify(items));
+        syncState = "ok";
+        dirty = false;
+
+        if (JSON.stringify(items) !== before) {
+          render();
+          if (quiet) toast("Updated from the sheet.");
+        } else {
+          renderTally();
+        }
+        if (fixed) save();
+      })
+      .catch(function () {
+        syncState = "bad";
+        renderTally();
+        if (!quiet) toast("Could not reach the sheet. Showing the last local copy.");
+      });
+  }
+
   function load() {
     $rows.innerHTML = '<div class="empty">Loading.</div>';
 
@@ -485,23 +539,7 @@
 
     var conf = syncConf();
     if (!conf || !conf.url) { syncState = "off"; render(); return; }
-
-    fetch(conf.url + "?token=" + encodeURIComponent(conf.token || "") + "&t=" + Date.now())
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (data.error) throw new Error(data.error);
-        items = Array.isArray(data.entries) ? data.entries : [];
-        var fixed = tidy(items);
-        local(LKEY, JSON.stringify(items));
-        syncState = "ok";
-        render();
-        if (fixed) save();
-      })
-      .catch(function () {
-        syncState = "bad";
-        render();
-        toast("Could not reach the sheet. Showing the last local copy.");
-      });
+    pullRemote(false);
   }
 
   function save() {
@@ -519,12 +557,14 @@
       .then(function (data) {
         if (data.error) throw new Error(data.error);
         syncState = "ok";
+        dirty = false;
         renderTally();
       })
       .catch(function () {
         syncState = "bad";
+        dirty = true;
         renderTally();
-        toast("Saved here, but the sheet did not update.");
+        toast("Saved here. The sheet did not update, will retry.");
       });
   }
 
@@ -800,18 +840,48 @@
       "digest: one sentence under 25 words on what the job involves day to day.\n" +
       'Use "" for anything the posting does not state. Do not guess.\n\nPOSTING:\n' + text;
 
-    fetch("https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL +
-          ":generateContent?key=" + encodeURIComponent(apiKey()), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: instruction }] }],
-        generationConfig: { responseMimeType: "application/json", temperature: 0 }
-      })
-    })
-      .then(function (r) { return r.json(); })
+    function callModel(model) {
+      return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model +
+                   ":generateContent?key=" + encodeURIComponent(apiKey()), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: instruction }] }],
+          generationConfig: { responseMimeType: "application/json", temperature: 0 }
+        })
+      }).then(function (r) {
+        return r.json().then(function (data) {
+          if (data.error) {
+            var err = new Error(data.error.message || "request failed");
+            err.status = data.error.status || r.status;
+            throw err;
+          }
+          return data;
+        });
+      });
+    }
+
+    // Start with whichever model worked last time, then fall through the rest.
+    var remembered = local(MKEY);
+    var queue = remembered
+      ? [remembered].concat(GEMINI_MODELS.filter(function (m) { return m !== remembered; }))
+      : GEMINI_MODELS.slice();
+
+    function attempt(i, lastErr) {
+      if (i >= queue.length) return Promise.reject(lastErr || new Error("no model answered"));
+      return callModel(queue[i])
+        .then(function (data) { local(MKEY, queue[i]); return data; })
+        .catch(function (e) {
+          // A missing model means try the next one. Anything else is a real problem.
+          var missing = e.status === 404 || e.status === "NOT_FOUND" ||
+                        /not found|not supported|does not exist/i.test(e.message || "");
+          if (!missing) throw e;
+          return attempt(i + 1, e);
+        });
+    }
+
+    attempt(0)
       .then(function (data) {
-        if (data.error) throw new Error(data.error.message || "api error");
         var raw = ((((data.candidates || [])[0] || {}).content || {}).parts || [])
           .map(function (p) { return p.text || ""; })
           .join("").replace(/```json|```/g, "").trim();
@@ -836,11 +906,24 @@
         render();
         toast("Fields read from the description.");
       })
-      .catch(function () {
+      .catch(function (e) {
         $btn.disabled = false;
         $btn.textContent = "Read the description";
         $hint.className = "hint bad";
-        $hint.textContent = "That read failed. Check the key, or close this and use Add manually.";
+
+        var msg = String((e && e.message) || "");
+        if (/API key not valid|API_KEY_INVALID/i.test(msg)) {
+          $hint.textContent = "That key was rejected. Check you copied the whole thing from AI Studio.";
+          try { localStorage.removeItem(AKEY); } catch (ignore) {}
+        } else if (/quota|RESOURCE_EXHAUSTED|rate/i.test(msg)) {
+          $hint.textContent = "Rate limited by Google. Wait a minute and try again.";
+        } else if (/not found|NOT_FOUND|not supported/i.test(msg)) {
+          $hint.textContent = "No usable model on this key. Google may have retired the ones listed in the file.";
+        } else if (/Failed to fetch|NetworkError/i.test(msg)) {
+          $hint.textContent = "Could not reach Google. Check your connection.";
+        } else {
+          $hint.textContent = "Read failed: " + (msg.slice(0, 140) || "unknown error");
+        }
       });
   }
 
@@ -1135,6 +1218,29 @@
     a.click();
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
   });
+
+  /* ---------- keeping in step with the sheet ---------- */
+
+  // A pull replaces everything on screen, so never run one while a panel is open
+  // and half filled in. Those moments are skipped and picked up on the next tick.
+  function busy() {
+    return editing !== null || pasting || importing || syncing;
+  }
+
+  function refresh() {
+    if (!syncConf() || busy()) return;
+    if (document.visibilityState === "hidden") return;
+    if (dirty) { save(); return; }
+    pullRemote(true);
+  }
+
+  setInterval(refresh, 120000);
+
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") refresh();
+  });
+
+  window.addEventListener("online", refresh);
 
   load();
 })();

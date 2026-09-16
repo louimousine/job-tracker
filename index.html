@@ -860,15 +860,42 @@
     render();
   }
 
+  function safeParse(raw) {
+    try { return JSON.parse(raw); } catch (e) {}
+
+    // Some job boards paste in raw line breaks and separator characters that end up
+    // unescaped inside string values. Escape them, then try again.
+    var out = "", inStr = false, esc = false;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw[i];
+      var code = raw.charCodeAt(i);
+
+      if (esc) { out += ch; esc = false; continue; }
+      if (inStr && ch === "\\") { out += ch; esc = true; continue; }
+      if (ch === '"') { inStr = !inStr; out += ch; continue; }
+
+      if (inStr && (code < 0x20 || code === 0x2028 || code === 0x2029)) {
+        if (ch === "\n") out += "\\n";
+        else if (ch === "\r") out += "\\r";
+        else if (ch === "\t") out += "\\t";
+        else out += "\\u" + ("000" + code.toString(16)).slice(-4);
+        continue;
+      }
+
+      out += ch;
+    }
+
+    try { return JSON.parse(out); } catch (e2) { return null; }
+  }
+
   function runImport() {
     var $hint = document.getElementById("importHint");
     var raw = (document.getElementById("i-json").value || "").trim();
-    var incoming;
+    var incoming = safeParse(raw);
 
-    try { incoming = JSON.parse(raw); }
-    catch (e) {
+    if (incoming === null) {
       $hint.className = "hint bad";
-      $hint.textContent = "That is not valid JSON. Paste the whole backup.";
+      $hint.textContent = "Could not read that. Check it starts with { and ends with }.";
       return;
     }
 
@@ -923,7 +950,9 @@
 
   function doCopy() {
     if (!items.length) { toast("Nothing to back up yet."); return; }
-    var payload = JSON.stringify({ entries: items });
+    var payload = JSON.stringify({ entries: items })
+      .replace(/\u2028/g, "\\u2028")
+      .replace(/\u2029/g, "\\u2029");
     markBackedUp();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(payload)

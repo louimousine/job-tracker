@@ -318,7 +318,7 @@
   <div class="heads" id="heads">
     <span>Days</span>
     <span>Company and role</span>
-    <span>Source</span>
+    <span>Found on</span>
     <span>Status</span>
   </div>
 
@@ -354,6 +354,14 @@
 
   var STATUSES = ["Saved", "Applied", "Screening", "Interview", "Offer", "Rejected"];
   var ROUTES = ["Cold application", "Referral", "Recruiter reached out", "Campus"];
+  var SOURCES = ["LinkedIn", "Careers page", "Naukri", "Instahyre", "From a person", "Campus portal", "Newsletter", "Other"];
+
+  var LEGACY_SOURCE = {
+    "ATS": "Careers page",
+    "Company site": "Careers page",
+    "Email": "From a person",
+    "Referral": "From a person"
+  };
   var AGEING = ["Applied", "Screening"];
 
   var items = [];
@@ -425,14 +433,9 @@
     return "fresh";
   }
 
-  function sourceFromUrl(url) {
-    var u = (url || "").toLowerCase();
-    if (!u) return "";
-    if (u.indexOf("linkedin.") > -1) return "LinkedIn";
-    if (u.indexOf("naukri.") > -1) return "Naukri";
-    if (u.indexOf("instahyre") > -1) return "Instahyre";
-    if (/greenhouse|lever\.co|myworkdayjobs|ashbyhq|smartrecruiters|workable|icims|taleo|successfactors/.test(u)) return "ATS";
-    return "Company site";
+  function host(url) {
+    var m = String(url || "").match(/^https?:\/\/(?:www\.)?([^\/?#]+)/i);
+    return m ? m[1] : "";
   }
 
   function toast(msg) {
@@ -448,6 +451,26 @@
 
   /* ---------- storage ---------- */
 
+  // Older entries sometimes have the posting URL sitting in the source field, and use
+  // source labels that described the posting's host rather than where it was found.
+  function tidy(list) {
+    var changed = false;
+    list.forEach(function (it) {
+      var s = String(it.source || "").trim();
+
+      if (/^https?:\/\//i.test(s)) {
+        if (!it.url) it.url = s;
+        it.source = "";
+        s = "";
+        changed = true;
+      }
+
+      if (s && LEGACY_SOURCE[s]) { it.source = LEGACY_SOURCE[s]; changed = true; }
+      else if (s && SOURCES.indexOf(s) === -1) { it.source = "Other"; changed = true; }
+    });
+    return changed;
+  }
+
   function load() {
     $rows.innerHTML = '<div class="empty">Loading.</div>';
 
@@ -455,6 +478,7 @@
       items = JSON.parse(local(LKEY) || "[]");
     } catch (e) { items = []; }
     if (!Array.isArray(items)) items = [];
+    tidy(items);
 
     lastBackup = Number(local(BKEY)) || null;
     render();
@@ -467,9 +491,11 @@
       .then(function (data) {
         if (data.error) throw new Error(data.error);
         items = Array.isArray(data.entries) ? data.entries : [];
+        var fixed = tidy(items);
         local(LKEY, JSON.stringify(items));
         syncState = "ok";
         render();
+        if (fixed) save();
       })
       .catch(function () {
         syncState = "bad";
@@ -597,7 +623,9 @@
       if (open) {
         html += '<div class="detail"><div class="meta">' +
           (it.appliedDate ? "<span>Applied <b>" + esc(it.appliedDate) + "</b></span>" : "<span>Not applied yet</span>") +
-          (it.url ? '<span>Posting <a href="' + esc(it.url) + '" target="_blank" rel="noopener"><b>Link</b></a></span>' : "") +
+          (it.url ? '<span>Posting <a href="' + esc(it.url) + '" target="_blank" rel="noopener"><b>Link</b></a>' +
+                    (host(it.url) ? " on " + esc(host(it.url)) : "") + "</span>" : "") +
+          (it.source ? "<span>Found on <b>" + esc(it.source) + "</b></span>" : "") +
           (it.route && it.route !== "Cold application"
             ? "<span><b>" + esc(it.route) + "</b>" + (it.referrer ? " via " + esc(it.referrer) : "") + "</span>"
             : "<span>Cold application</span>") +
@@ -693,7 +721,11 @@
         "</select></div>" +
         '<div class="field"><label for="f-appliedDate">Date applied</label>' +
           '<input id="f-appliedDate" type="date" value="' + esc(it.appliedDate || "") + '"></div>' +
-        field("source", "Source", it.source, "Filled from the link if left blank") +
+        '<div class="field"><label for="f-source">Found on</label><select id="f-source">' +
+          SOURCES.map(function (s) {
+            return '<option value="' + s + '"' + (s === (it.source || "LinkedIn") ? " selected" : "") + ">" + s + "</option>";
+          }).join("") +
+        "</select></div>" +
         '<div class="field"><label for="f-route">How you applied</label><select id="f-route">' +
           ROUTES.map(function (r) {
             return "<option" + (r === (it.route || "Cold application") ? " selected" : "") + ">" + r + "</option>";
@@ -826,7 +858,7 @@
       location: v("location"),
       status: document.getElementById("f-status").value,
       appliedDate: v("appliedDate"),
-      source: v("source") || sourceFromUrl(url),
+      source: document.getElementById("f-source").value,
       route: document.getElementById("f-route").value,
       referrer: v("referrer"),
       resume: v("resume"),
@@ -926,6 +958,7 @@
     });
 
     importing = false;
+    tidy(items);
     save();
     render();
     toast(added ? "Imported " + added + (added === 1 ? " entry." : " entries.") : "Nothing new to import.");

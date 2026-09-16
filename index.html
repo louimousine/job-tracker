@@ -1,0 +1,1079 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Application tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Archivo+Narrow:wght@500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #E7E8E2;
+    --card: #F3F4EF;
+    --ink: #171A17;
+    --muted: #64695F;
+    --rule: #C8CBC0;
+    --rule-soft: #D9DBD2;
+    --fresh: #2E6B4F;
+    --aging: #96680F;
+    --stale: #94302A;
+    --accent: #24405C;
+    --font: "Archivo", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-narrow: "Archivo Narrow", "Archivo", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 64px; }
+
+  .masthead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .masthead h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 0; }
+
+  .tally {
+    font-family: var(--font-narrow);
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tally b { color: var(--ink); font-weight: 600; }
+  .tally .warn { color: var(--stale); }
+
+  .sync-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: 0;
+    background: var(--muted);
+  }
+  .sync-dot.ok { background: var(--fresh); }
+  .sync-dot.bad { background: var(--stale); }
+
+  .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; padding: 14px 0; }
+
+  button { font-family: var(--font); font-size: 14px; cursor: pointer; border-radius: 3px; }
+
+  .btn-primary {
+    background: var(--accent); color: #F3F4EF;
+    border: 1px solid var(--accent);
+    padding: 7px 14px; font-weight: 500;
+  }
+  .btn-primary:hover { background: #1B3049; }
+
+  .btn-quiet {
+    background: transparent; color: var(--muted);
+    border: 1px solid var(--rule); padding: 6px 11px;
+  }
+  .btn-quiet:hover { color: var(--ink); border-color: var(--muted); }
+
+  button[disabled] { opacity: 0.55; cursor: progress; }
+
+  .search {
+    flex: 1 1 200px; min-width: 160px;
+    font-family: var(--font); font-size: 14px;
+    padding: 7px 10px; background: var(--card);
+    border: 1px solid var(--rule); border-radius: 3px; color: var(--ink);
+  }
+  .search::placeholder { color: var(--muted); }
+
+  .filters { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .chip {
+    font-family: var(--font-narrow); font-size: 13.5px;
+    background: transparent; border: 1px solid transparent;
+    color: var(--muted); padding: 5px 9px;
+  }
+  .chip:hover { color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    color: var(--ink); border-color: var(--rule);
+    background: var(--card); font-weight: 600;
+  }
+
+  .heads {
+    display: grid;
+    grid-template-columns: 52px 1fr 132px 116px;
+    gap: 12px;
+    padding: 0 12px 6px 14px;
+    border-bottom: 1px solid var(--rule);
+    font-family: var(--font-narrow);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .heads span:first-child { text-align: right; }
+
+  .rows { border-bottom: 1px solid var(--rule); }
+
+  .row { border-bottom: 1px solid var(--rule-soft); border-left: 3px solid transparent; }
+  .row:last-child { border-bottom: none; }
+  .row.age-fresh { border-left-color: var(--fresh); }
+  .row.age-aging { border-left-color: var(--aging); }
+  .row.age-stale { border-left-color: var(--stale); }
+
+  .row-main {
+    display: grid;
+    grid-template-columns: 52px 1fr 132px 116px;
+    gap: 12px;
+    align-items: center;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 11px;
+    font-family: var(--font);
+    color: var(--ink);
+  }
+  .row-main:hover { background: var(--card); }
+  .row-main > * { min-width: 0; }
+
+  .age {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px; font-weight: 600; color: var(--muted);
+  }
+  .age.fresh { color: var(--fresh); }
+  .age.aging { color: var(--aging); }
+  .age.stale { color: var(--stale); }
+
+  .who { min-width: 0; }
+
+  .company {
+    font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .role {
+    font-size: 13.5px; color: var(--muted);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  .source {
+    font-family: var(--font-narrow); font-size: 13.5px; color: var(--muted);
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .tag {
+    font-family: var(--font-narrow); font-size: 13px; font-weight: 600;
+    padding: 3px 8px; border-radius: 2px; border: 1px solid;
+    display: inline-block; white-space: nowrap;
+  }
+  .tag.saved     { color: var(--muted); border-color: var(--rule); }
+  .tag.applied   { color: var(--accent); border-color: #A9B6C4; background: #DFE5EB; }
+  .tag.screening { color: var(--accent); border-color: var(--accent); background: #DFE5EB; }
+  .tag.interview { color: var(--fresh); border-color: var(--fresh); background: #DDE9E2; }
+  .tag.offer     { color: #F3F4EF; border-color: var(--fresh); background: var(--fresh); }
+  .tag.rejected  { color: var(--muted); border-color: var(--rule); background: #DFDFD9; }
+
+  .row.is-rejected .company, .row.is-rejected .role { color: var(--muted); }
+  .row.is-rejected .company { font-weight: 500; }
+
+  .detail { padding: 4px 14px 20px 14px; background: var(--card); border-top: 1px solid var(--rule-soft); }
+
+  .meta {
+    display: flex; gap: 22px; flex-wrap: wrap;
+    font-size: 13.5px; color: var(--muted); padding: 12px 0;
+    min-width: 0; overflow-wrap: anywhere;
+  }
+  .meta > span { max-width: 100%; }
+  .meta b { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+  .meta a { color: var(--accent); }
+
+  .jd {
+    background: var(--paper); border: 1px solid var(--rule); border-radius: 2px;
+    padding: 13px 15px; max-height: 300px; overflow-y: auto;
+    white-space: pre-wrap; font-size: 13.5px; line-height: 1.6;
+    max-width: 74ch; overflow-wrap: anywhere;
+  }
+
+  .jd-empty { font-size: 13.5px; color: var(--muted); padding: 6px 0; }
+
+  .notes {
+    font-size: 13.5px; padding: 10px 0 0; max-width: 74ch;
+    white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+
+  .detail-actions { display: flex; gap: 8px; padding-top: 14px; flex-wrap: wrap; }
+
+  .btn-danger { color: var(--stale); border-color: #D5B6B3; }
+  .btn-danger:hover { color: var(--stale); border-color: var(--stale); }
+
+  .form {
+    background: var(--card); border: 1px solid var(--rule); border-radius: 3px;
+    padding: 18px; margin-bottom: 18px;
+  }
+  .form h2 { font-size: 16px; font-weight: 600; margin: 0 0 14px; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field.wide { grid-column: 1 / -1; }
+
+  label { font-family: var(--font-narrow); font-size: 13px; color: var(--muted); }
+
+  input, select, textarea {
+    font-family: var(--font); font-size: 14px; padding: 7px 9px;
+    background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 2px; color: var(--ink); width: 100%;
+  }
+
+  textarea { resize: vertical; line-height: 1.55; min-height: 120px; }
+  .paste-jd { min-height: 210px; }
+
+  .form-actions { display: flex; gap: 8px; padding-top: 15px; align-items: center; flex-wrap: wrap; }
+
+  .hint { font-size: 13px; color: var(--muted); }
+  .hint.bad { color: var(--stale); }
+  .hint.good { color: var(--fresh); }
+
+  .prefill-note { font-size: 13px; color: var(--fresh); padding-bottom: 12px; margin-top: -6px; }
+
+  .nag {
+    background: #F6EEDC; border: 1px solid #D9C48E; border-left: 3px solid var(--aging);
+    border-radius: 2px; padding: 11px 14px; margin-bottom: 14px;
+    font-size: 13.5px; color: #6B4E12;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap;
+  }
+  .nag button {
+    background: transparent; border: 1px solid #C9AE6E;
+    color: #6B4E12; padding: 5px 11px; font-size: 13px;
+  }
+
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .empty { padding: 48px 16px; text-align: center; color: var(--muted); font-size: 14.5px; }
+  .empty b { color: var(--ink); font-weight: 600; display: block; margin-bottom: 5px; font-size: 15px; }
+
+  .footer {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap; padding-top: 16px; font-size: 13px; color: var(--muted);
+  }
+  .footer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-family: var(--font-narrow); font-size: 13px; color: var(--muted); }
+  .legend i { display: inline-block; width: 3px; height: 12px; margin-right: 6px; vertical-align: -1px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%);
+    background: var(--ink); color: var(--paper);
+    padding: 9px 16px; border-radius: 3px; font-size: 13.5px;
+    opacity: 0; pointer-events: none; transition: opacity 140ms ease; z-index: 20;
+  }
+  .toast.show { opacity: 1; }
+
+  [hidden] { display: none !important; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  @media (max-width: 620px) {
+    .heads { display: none; }
+    .row-main {
+      grid-template-columns: 44px 1fr;
+      grid-template-areas: "age who" ". tags";
+      row-gap: 7px;
+    }
+    .row-main .age { grid-area: age; }
+    .row-main .who { grid-area: who; }
+    .row-main .source { display: none; }
+    .row-main .status-cell { grid-area: tags; }
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <h1>Application tracker</h1>
+    <div class="tally" id="tally"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="btn-primary" id="pasteBtn">Paste a description</button>
+    <button class="btn-quiet" id="addBtn">Add manually</button>
+    <input class="search" id="search" type="search" placeholder="Search company, role, or JD text" aria-label="Search entries">
+    <div class="filters" id="filters"></div>
+  </div>
+
+  <div id="formHost"></div>
+  <div id="backupNag"></div>
+
+  <div class="heads" id="heads">
+    <span>Days</span>
+    <span>Company and role</span>
+    <span>Source</span>
+    <span>Status</span>
+  </div>
+
+  <div class="rows" id="rows"></div>
+
+  <div class="footer">
+    <div class="legend">
+      <span><i style="background:var(--fresh)"></i>Under 10 days</span>
+      <span><i style="background:var(--aging)"></i>10 to 20 days</span>
+      <span><i style="background:var(--stale)"></i>21 days or more</span>
+    </div>
+    <div class="footer-actions">
+      <button class="btn-quiet" id="syncBtn">Sync settings</button>
+      <button class="btn-quiet" id="importBtn">Import</button>
+      <button class="btn-quiet" id="exportCsv">Export CSV</button>
+      <button class="btn-quiet" id="copyJson">Copy backup</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var LKEY = "tracker:applications";  // local cache
+  var BKEY = "tracker:lastbackup";
+  var AKEY = "tracker:apikey";
+  var SKEY = "tracker:sync";          // { url, token }
+  var GEMINI_MODEL = "gemini-2.5-flash";
+
+  var STATUSES = ["Saved", "Applied", "Screening", "Interview", "Offer", "Rejected"];
+  var ROUTES = ["Cold application", "Referral", "Recruiter reached out", "Campus"];
+  var AGEING = ["Applied", "Screening"];
+
+  var items = [];
+  var lastBackup = null;
+  var syncState = "off"; // off, ok, bad
+  var filter = "All";
+  var query = "";
+  var openId = null;
+  var editing = null;
+  var pasting = false;
+  var importing = false;
+  var syncing = false;
+  var draftSeed = null;
+  var prefilled = false;
+
+  var $rows = document.getElementById("rows");
+  var $tally = document.getElementById("tally");
+  var $filters = document.getElementById("filters");
+  var $formHost = document.getElementById("formHost");
+  var $heads = document.getElementById("heads");
+  var $toast = document.getElementById("toast");
+  var $nag = document.getElementById("backupNag");
+
+  /* ---------- small helpers ---------- */
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function local(k, v) {
+    try {
+      if (v === undefined) return localStorage.getItem(k);
+      localStorage.setItem(k, v);
+      return v;
+    } catch (e) { return null; }
+  }
+
+  function syncConf() {
+    try { return JSON.parse(local(SKEY) || "null") || null; } catch (e) { return null; }
+  }
+
+  function apiKey() { return local(AKEY) || ""; }
+
+  function today() {
+    var d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function isoToday() {
+    var d = today();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function daysSince(iso) {
+    if (!iso) return null;
+    var p = String(iso).split("-");
+    if (p.length !== 3) return null;
+    var then = new Date(+p[0], +p[1] - 1, +p[2]);
+    if (isNaN(then)) return null;
+    return Math.max(0, Math.round((today() - then) / 86400000));
+  }
+
+  function bucket(n) {
+    if (n == null) return "";
+    if (n >= 21) return "stale";
+    if (n >= 10) return "aging";
+    return "fresh";
+  }
+
+  function sourceFromUrl(url) {
+    var u = (url || "").toLowerCase();
+    if (!u) return "";
+    if (u.indexOf("linkedin.") > -1) return "LinkedIn";
+    if (u.indexOf("naukri.") > -1) return "Naukri";
+    if (u.indexOf("instahyre") > -1) return "Instahyre";
+    if (/greenhouse|lever\.co|myworkdayjobs|ashbyhq|smartrecruiters|workable|icims|taleo|successfactors/.test(u)) return "ATS";
+    return "Company site";
+  }
+
+  function toast(msg) {
+    $toast.textContent = msg;
+    $toast.classList.add("show");
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { $toast.classList.remove("show"); }, 2100);
+  }
+
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  }
+
+  /* ---------- storage ---------- */
+
+  function load() {
+    $rows.innerHTML = '<div class="empty">Loading.</div>';
+
+    try {
+      items = JSON.parse(local(LKEY) || "[]");
+    } catch (e) { items = []; }
+    if (!Array.isArray(items)) items = [];
+
+    lastBackup = Number(local(BKEY)) || null;
+    render();
+
+    var conf = syncConf();
+    if (!conf || !conf.url) { syncState = "off"; render(); return; }
+
+    fetch(conf.url + "?token=" + encodeURIComponent(conf.token || "") + "&t=" + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        items = Array.isArray(data.entries) ? data.entries : [];
+        local(LKEY, JSON.stringify(items));
+        syncState = "ok";
+        render();
+      })
+      .catch(function () {
+        syncState = "bad";
+        render();
+        toast("Could not reach the sheet. Showing the last local copy.");
+      });
+  }
+
+  function save() {
+    local(LKEY, JSON.stringify(items));
+
+    var conf = syncConf();
+    if (!conf || !conf.url) { syncState = "off"; return Promise.resolve(); }
+
+    return fetch(conf.url, {
+      method: "POST",
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ token: conf.token || "", entries: items })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error);
+        syncState = "ok";
+        renderTally();
+      })
+      .catch(function () {
+        syncState = "bad";
+        renderTally();
+        toast("Saved here, but the sheet did not update.");
+      });
+  }
+
+  /* ---------- derived ---------- */
+
+  function visible() {
+    var q = query.trim().toLowerCase();
+    return items.filter(function (it) {
+      if (filter !== "All" && it.status !== filter) return false;
+      if (!q) return true;
+      return [it.company, it.role, it.location, it.source, it.resume, it.referrer, it.route, it.notes, it.jd]
+        .join(" ").toLowerCase().indexOf(q) > -1;
+    }).sort(function (a, b) {
+      var ra = a.status === "Rejected" ? 1 : 0;
+      var rb = b.status === "Rejected" ? 1 : 0;
+      if (ra !== rb) return ra - rb;
+      var da = AGEING.indexOf(a.status) > -1 ? (daysSince(a.appliedDate) || 0) : -1;
+      var db = AGEING.indexOf(b.status) > -1 ? (daysSince(b.appliedDate) || 0) : -1;
+      if (da !== db) return db - da;
+      return (Number(b.createdAt) || 0) - (Number(a.createdAt) || 0);
+    });
+  }
+
+  function resumeNames() {
+    var seen = {};
+    items.forEach(function (it) { if (it.resume) seen[it.resume] = true; });
+    return Object.keys(seen).sort();
+  }
+
+  /* ---------- render ---------- */
+
+  function renderTally() {
+    var waiting = items.filter(function (it) { return AGEING.indexOf(it.status) > -1; });
+    var stale = waiting.filter(function (it) { return (daysSince(it.appliedDate) || 0) >= 21; }).length;
+
+    var dot = syncState === "ok" ? "ok" : (syncState === "bad" ? "bad" : "");
+    var label = syncState === "ok" ? "Synced" : (syncState === "bad" ? "Not synced" : "This device only");
+
+    var parts = ["<b>" + items.length + "</b> logged", "<b>" + waiting.length + "</b> awaiting a reply"];
+    if (stale) parts.push('<span class="warn"><b>' + stale + "</b> past three weeks</span>");
+    parts.push('<span><i class="sync-dot ' + dot + '"></i>' + label + "</span>");
+    $tally.innerHTML = parts.join(", ");
+  }
+
+  function renderNag() {
+    if (syncConf() || items.length < 3) { $nag.innerHTML = ""; return; }
+    var days = lastBackup ? Math.floor((Date.now() - lastBackup) / 86400000) : null;
+    if (days !== null && days < 14) { $nag.innerHTML = ""; return; }
+    $nag.innerHTML = '<div class="nag"><span>' +
+      (days === null ? "Nothing is backed up yet, and sync is off." : "Last backup was " + days + " days ago.") +
+      '</span><button id="nagCopy">Copy backup</button></div>';
+  }
+
+  function renderFilters() {
+    var counts = {};
+    items.forEach(function (it) { counts[it.status] = (counts[it.status] || 0) + 1; });
+    $filters.innerHTML = ["All"].concat(STATUSES).map(function (t) {
+      var n = t === "All" ? items.length : (counts[t] || 0);
+      if (t !== "All" && !n) return "";
+      return '<button class="chip" data-filter="' + t + '" aria-pressed="' + (filter === t) + '">' + esc(t) + " " + n + "</button>";
+    }).join("");
+  }
+
+  function renderRows() {
+    var list = visible();
+
+    if (!items.length) {
+      $heads.hidden = true;
+      $rows.innerHTML = '<div class="empty"><b>Nothing logged yet.</b>Paste a job description to start building the record.</div>';
+      return;
+    }
+    if (!list.length) {
+      $heads.hidden = false;
+      $rows.innerHTML = '<div class="empty"><b>No entries match.</b>Clear the search or pick a different status.</div>';
+      return;
+    }
+
+    $heads.hidden = false;
+    $rows.innerHTML = list.map(function (it) {
+      var ages = AGEING.indexOf(it.status) > -1;
+      var n = ages ? daysSince(it.appliedDate) : null;
+      var b = ages ? bucket(n) : "";
+      var open = openId === it.id;
+
+      var html = '<div class="row ' + (b ? "age-" + b : "") + (it.status === "Rejected" ? " is-rejected" : "") + '">' +
+        '<button class="row-main" data-open="' + esc(it.id) + '" aria-expanded="' + open + '">' +
+          '<span class="age ' + b + '">' + (n == null ? "" : n) + "</span>" +
+          '<span class="who">' +
+            '<span class="company">' + esc(it.company || "Untitled") + "</span>" +
+            '<span class="role">' + esc(it.role || "Role not recorded") + (it.location ? ", " + esc(it.location) : "") + "</span>" +
+          "</span>" +
+          '<span class="source">' + esc(it.source || "") + "</span>" +
+          '<span class="status-cell"><span class="tag ' + String(it.status).toLowerCase() + '">' + esc(it.status) + "</span></span>" +
+        "</button>";
+
+      if (open) {
+        html += '<div class="detail"><div class="meta">' +
+          (it.appliedDate ? "<span>Applied <b>" + esc(it.appliedDate) + "</b></span>" : "<span>Not applied yet</span>") +
+          (it.url ? '<span>Posting <a href="' + esc(it.url) + '" target="_blank" rel="noopener"><b>Link</b></a></span>' : "") +
+          (it.route && it.route !== "Cold application"
+            ? "<span><b>" + esc(it.route) + "</b>" + (it.referrer ? " via " + esc(it.referrer) : "") + "</span>"
+            : "<span>Cold application</span>") +
+          (it.resume ? "<span>Resume <b>" + esc(it.resume) + "</b></span>" : "") +
+          "</div>" +
+          (it.jd ? '<div class="jd">' + esc(it.jd) + "</div>" : '<div class="jd-empty">No description saved.</div>') +
+          (it.notes ? '<div class="notes">' + esc(it.notes) + "</div>" : "") +
+          '<div class="detail-actions">' +
+            '<select class="search" style="flex:0 0 auto;width:auto" data-status="' + esc(it.id) + '" aria-label="Change status">' +
+              STATUSES.map(function (s) {
+                return '<option value="' + s + '"' + (s === it.status ? " selected" : "") + ">" + s + "</option>";
+              }).join("") +
+            "</select>" +
+            '<button class="btn-quiet" data-edit="' + esc(it.id) + '">Edit</button>' +
+            '<button class="btn-quiet btn-danger" data-del="' + esc(it.id) + '">Delete</button>' +
+          "</div></div>";
+      }
+
+      return html + "</div>";
+    }).join("");
+  }
+
+  function field(id, label, val, hint) {
+    return '<div class="field"><label for="f-' + id + '">' + label + "</label>" +
+      '<input id="f-' + id + '" value="' + esc(val || "") + '"' + (hint ? ' placeholder="' + esc(hint) + '"' : "") + "></div>";
+  }
+
+  function renderPaste() {
+    var hasKey = !!apiKey();
+    $formHost.innerHTML = '<div class="form"><h2>Paste the description</h2>' +
+      '<div class="field wide"><textarea id="p-jd" class="paste-jd" placeholder="Paste the whole posting. Company, role, location and posting date get read out of it."></textarea></div>' +
+      (hasKey ? "" :
+        '<div class="field wide" style="padding-top:12px"><label for="p-key">Gemini API key</label>' +
+        '<input id="p-key" type="password" placeholder="AIza...">' +
+        '<span class="hint">Free from Google AI Studio, no card needed. Saved in this browser only, never in the file. Skip it and use Add manually instead.</span></div>') +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" id="readJd">Read the description</button>' +
+        '<button class="btn-quiet" id="cancelPaste">Cancel</button>' +
+        '<span class="hint" id="pasteHint">You check everything before it saves.</span>' +
+      "</div></div>";
+    var ta = document.getElementById("p-jd");
+    if (ta) ta.focus();
+  }
+
+  function renderSync() {
+    var conf = syncConf() || { url: "", token: "" };
+    $formHost.innerHTML = '<div class="form"><h2>Sync settings</h2>' +
+      '<div class="field wide"><label for="s-url">Apps Script web app URL</label>' +
+        '<input id="s-url" type="url" value="' + esc(conf.url) + '" placeholder="https://script.google.com/macros/s/.../exec"></div>' +
+      '<div class="field wide"><label for="s-token">Token</label>' +
+        '<input id="s-token" value="' + esc(conf.token) + '" placeholder="The TOKEN value from Code.gs"></div>' +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" id="saveSync">Save and pull</button>' +
+        '<button class="btn-quiet" id="pushSync">Push this device up</button>' +
+        '<button class="btn-quiet" id="cancelImport">Close</button>' +
+      "</div>" +
+      '<div class="hint" id="syncHint" style="padding-top:10px">Save and pull replaces what is here with the sheet. Push sends this device up, overwriting the sheet.</div>' +
+      "</div>";
+  }
+
+  function renderImport() {
+    $formHost.innerHTML = '<div class="form"><h2>Import entries</h2>' +
+      '<div class="field wide"><textarea id="i-json" class="paste-jd" placeholder="Paste a backup here."></textarea></div>' +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" id="runImport">Import</button>' +
+        '<button class="btn-quiet" id="cancelImport">Cancel</button>' +
+        '<span class="hint" id="importHint">Entries are added to what is already here. Nothing gets overwritten.</span>' +
+      "</div></div>";
+    var ta = document.getElementById("i-json");
+    if (ta) ta.focus();
+  }
+
+  function renderForm() {
+    if (syncing) { renderSync(); return; }
+    if (importing) { renderImport(); return; }
+    if (pasting) { renderPaste(); return; }
+    if (!editing) { $formHost.innerHTML = ""; return; }
+
+    var it = editing === "new"
+      ? (draftSeed || { company: "", role: "", location: "", source: "", url: "", status: "Applied", appliedDate: isoToday(), jd: "", notes: "" })
+      : items.filter(function (x) { return x.id === editing; })[0];
+    if (!it) { editing = null; $formHost.innerHTML = ""; return; }
+
+    $formHost.innerHTML = '<div class="form">' +
+      "<h2>" + (editing === "new" ? "New entry" : "Edit entry") + "</h2>" +
+      (prefilled ? '<div class="prefill-note">Read from the description you pasted. Check it, set the status, add the link.</div>' : "") +
+      '<div class="grid">' +
+        field("company", "Company", it.company) +
+        field("role", "Role", it.role) +
+        field("location", "Location", it.location) +
+        '<div class="field"><label for="f-status">Status</label><select id="f-status">' +
+          STATUSES.map(function (s) { return "<option" + (s === it.status ? " selected" : "") + ">" + s + "</option>"; }).join("") +
+        "</select></div>" +
+        '<div class="field"><label for="f-appliedDate">Date applied</label>' +
+          '<input id="f-appliedDate" type="date" value="' + esc(it.appliedDate || "") + '"></div>' +
+        field("source", "Source", it.source, "Filled from the link if left blank") +
+        '<div class="field"><label for="f-route">How you applied</label><select id="f-route">' +
+          ROUTES.map(function (r) {
+            return "<option" + (r === (it.route || "Cold application") ? " selected" : "") + ">" + r + "</option>";
+          }).join("") +
+        "</select></div>" +
+        field("referrer", "Referred by", it.referrer, "Name, and where they work") +
+        '<div class="field"><label for="f-resume">Resume sent</label>' +
+          '<input id="f-resume" list="resumeList" value="' + esc(it.resume || "") + '" placeholder="Which version, e.g. IB template v3">' +
+          '<datalist id="resumeList">' +
+            resumeNames().map(function (r) { return '<option value="' + esc(r) + '">'; }).join("") +
+          "</datalist></div>" +
+        '<div class="field wide"><label for="f-url">Link to the posting</label>' +
+          '<input id="f-url" type="url" value="' + esc(it.url || "") + '" placeholder="https://"></div>' +
+        '<div class="field wide"><label for="f-jd">Job description</label>' +
+          '<textarea id="f-jd" placeholder="Paste the full posting here while it is still live.">' + esc(it.jd || "") + "</textarea></div>" +
+        '<div class="field wide"><label for="f-notes">Notes</label>' +
+          '<input id="f-notes" value="' + esc(it.notes || "") + '" placeholder="Who you spoke to, what you sent"></div>' +
+      "</div>" +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" id="saveEntry">Save entry</button>' +
+        '<button class="btn-quiet" id="cancelEntry">Cancel</button>' +
+        '<span class="hint">Company is the only field required.</span>' +
+      "</div></div>";
+
+    var first = document.getElementById("f-company");
+    if (first) first.focus();
+  }
+
+  function render() {
+    renderTally();
+    renderNag();
+    renderFilters();
+    renderForm();
+    renderRows();
+  }
+
+  /* ---------- reading a description ---------- */
+
+  function readDescription() {
+    var ta = document.getElementById("p-jd");
+    var $btn = document.getElementById("readJd");
+    var $hint = document.getElementById("pasteHint");
+    var text = (ta.value || "").trim();
+
+    if (text.length < 60) {
+      $hint.className = "hint bad";
+      $hint.textContent = "That looks too short. Paste the full posting.";
+      return;
+    }
+
+    var keyField = document.getElementById("p-key");
+    if (keyField && keyField.value.trim()) local(AKEY, keyField.value.trim());
+
+    if (!apiKey()) {
+      $hint.className = "hint bad";
+      $hint.textContent = "Add a key above, or close this and use Add manually.";
+      return;
+    }
+
+    $btn.disabled = true;
+    $btn.textContent = "Reading";
+    $hint.className = "hint";
+    $hint.textContent = "Pulling the fields out.";
+
+    var instruction =
+      "Extract details from the job posting below. Reply with ONLY a JSON object.\n" +
+      'Keys: "company", "role", "location", "postedDate", "digest".\n' +
+      "company: the hiring organisation.\n" +
+      "role: the job title, cleaned up. Include the team or division if stated.\n" +
+      "location: city and country only.\n" +
+      'postedDate: YYYY-MM-DD if a posting date appears, otherwise "".\n' +
+      "digest: one sentence under 25 words on what the job involves day to day.\n" +
+      'Use "" for anything the posting does not state. Do not guess.\n\nPOSTING:\n' + text;
+
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/" + GEMINI_MODEL +
+          ":generateContent?key=" + encodeURIComponent(apiKey()), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: instruction }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0 }
+      })
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data.error) throw new Error(data.error.message || "api error");
+        var raw = ((((data.candidates || [])[0] || {}).content || {}).parts || [])
+          .map(function (p) { return p.text || ""; })
+          .join("").replace(/```json|```/g, "").trim();
+
+        var parsed = JSON.parse(raw.slice(raw.indexOf("{"), raw.lastIndexOf("}") + 1));
+
+        var note = "";
+        if (parsed.postedDate) note += "Posted " + parsed.postedDate + ". ";
+        if (parsed.digest) note += parsed.digest;
+
+        draftSeed = {
+          company: parsed.company || "",
+          role: parsed.role || "",
+          location: parsed.location || "",
+          source: "", url: "", status: "Saved", appliedDate: "",
+          jd: text, notes: note.trim()
+        };
+
+        prefilled = true;
+        pasting = false;
+        editing = "new";
+        render();
+        toast("Fields read from the description.");
+      })
+      .catch(function () {
+        $btn.disabled = false;
+        $btn.textContent = "Read the description";
+        $hint.className = "hint bad";
+        $hint.textContent = "That read failed. Check the key, or close this and use Add manually.";
+      });
+  }
+
+  /* ---------- actions ---------- */
+
+  function commit() {
+    var v = function (id) { var el = document.getElementById("f-" + id); return el ? el.value.trim() : ""; };
+    var company = v("company");
+    if (!company) { toast("Add a company name to save this entry."); document.getElementById("f-company").focus(); return; }
+
+    var url = v("url");
+    var data = {
+      company: company,
+      role: v("role"),
+      location: v("location"),
+      status: document.getElementById("f-status").value,
+      appliedDate: v("appliedDate"),
+      source: v("source") || sourceFromUrl(url),
+      route: document.getElementById("f-route").value,
+      referrer: v("referrer"),
+      resume: v("resume"),
+      url: url,
+      jd: document.getElementById("f-jd").value.trim(),
+      notes: v("notes")
+    };
+
+    if (data.status === "Saved") data.appliedDate = "";
+    else if (!data.appliedDate) data.appliedDate = isoToday();
+
+    if (editing === "new") {
+      data.id = uid();
+      data.createdAt = Date.now();
+      items.unshift(data);
+      toast("Entry saved.");
+    } else {
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id === editing) {
+          for (var k in data) items[i][k] = data[k];
+          break;
+        }
+      }
+      toast("Entry updated.");
+    }
+
+    editing = null;
+    draftSeed = null;
+    prefilled = false;
+    save();
+    render();
+  }
+
+  function runImport() {
+    var $hint = document.getElementById("importHint");
+    var raw = (document.getElementById("i-json").value || "").trim();
+    var incoming;
+
+    try { incoming = JSON.parse(raw); }
+    catch (e) {
+      $hint.className = "hint bad";
+      $hint.textContent = "That is not valid JSON. Paste the whole backup.";
+      return;
+    }
+
+    if (incoming && !Array.isArray(incoming) && Array.isArray(incoming.entries)) incoming = incoming.entries;
+    if (!Array.isArray(incoming)) {
+      $hint.className = "hint bad";
+      $hint.textContent = "Expected a list of entries.";
+      return;
+    }
+
+    var have = {};
+    items.forEach(function (it) {
+      have[it.id] = true;
+      have[(it.company || "") + "|" + (it.role || "")] = true;
+    });
+
+    var added = 0;
+    incoming.forEach(function (it) {
+      if (!it || typeof it !== "object" || !it.company) return;
+      if (have[it.id] || have[(it.company || "") + "|" + (it.role || "")]) return;
+      it.id = it.id || uid();
+      it.createdAt = it.createdAt || Date.now();
+      it.status = STATUSES.indexOf(it.status) > -1 ? it.status : "Saved";
+      delete it.resumeUrl;
+      items.push(it);
+      have[it.id] = true;
+      added++;
+    });
+
+    importing = false;
+    save();
+    render();
+    toast(added ? "Imported " + added + (added === 1 ? " entry." : " entries.") : "Nothing new to import.");
+  }
+
+  function markBackedUp() {
+    lastBackup = Date.now();
+    local(BKEY, String(lastBackup));
+  }
+
+  function showCopyBox(payload) {
+    $formHost.innerHTML = '<div class="form"><h2>Your backup</h2>' +
+      '<div class="field wide"><textarea id="c-json" class="paste-jd"></textarea>' +
+      '<span class="hint">Select all, copy, and paste it into a text file.</span></div>' +
+      '<div class="form-actions"><button class="btn-quiet" id="cancelImport">Close</button></div></div>';
+    var t = document.getElementById("c-json");
+    t.value = payload;
+    t.focus();
+    t.select();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function doCopy() {
+    if (!items.length) { toast("Nothing to back up yet."); return; }
+    var payload = JSON.stringify({ entries: items });
+    markBackedUp();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(payload)
+        .then(function () { toast("Copied."); render(); })
+        .catch(function () { showCopyBox(payload); });
+    } else {
+      showCopyBox(payload);
+    }
+  }
+
+  /* ---------- wiring ---------- */
+
+  document.getElementById("pasteBtn").addEventListener("click", function () {
+    pasting = true; importing = false; syncing = false;
+    editing = null; draftSeed = null; prefilled = false; openId = null;
+    render();
+  });
+
+  document.getElementById("addBtn").addEventListener("click", function () {
+    pasting = false; importing = false; syncing = false;
+    draftSeed = null; prefilled = false; editing = "new"; openId = null;
+    render();
+  });
+
+  document.getElementById("importBtn").addEventListener("click", function () {
+    importing = true; pasting = false; syncing = false; editing = null; openId = null;
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  document.getElementById("syncBtn").addEventListener("click", function () {
+    syncing = true; importing = false; pasting = false; editing = null; openId = null;
+    render();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  document.getElementById("copyJson").addEventListener("click", doCopy);
+
+  $nag.addEventListener("click", function (e) {
+    if (e.target.id === "nagCopy") doCopy();
+  });
+
+  document.getElementById("search").addEventListener("input", function (e) {
+    query = e.target.value;
+    renderRows();
+  });
+
+  $filters.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-filter]");
+    if (!b) return;
+    filter = b.dataset.filter;
+    renderFilters();
+    renderRows();
+  });
+
+  $formHost.addEventListener("click", function (e) {
+    var id = e.target.id;
+    if (id === "saveEntry") commit();
+    if (id === "readJd") readDescription();
+    if (id === "runImport") runImport();
+    if (id === "cancelPaste") { pasting = false; render(); }
+    if (id === "cancelImport") { importing = false; syncing = false; render(); }
+    if (id === "cancelEntry") { editing = null; draftSeed = null; prefilled = false; render(); }
+
+    if (id === "saveSync") {
+      var conf = {
+        url: document.getElementById("s-url").value.trim(),
+        token: document.getElementById("s-token").value.trim()
+      };
+      local(SKEY, JSON.stringify(conf));
+      syncing = false;
+      load();
+      toast("Sync saved. Pulling from the sheet.");
+    }
+
+    if (id === "pushSync") {
+      var $h = document.getElementById("syncHint");
+      var c = {
+        url: document.getElementById("s-url").value.trim(),
+        token: document.getElementById("s-token").value.trim()
+      };
+      if (!c.url) { $h.className = "hint bad"; $h.textContent = "Add the web app URL first."; return; }
+      local(SKEY, JSON.stringify(c));
+      $h.className = "hint";
+      $h.textContent = "Pushing.";
+      save().then(function () {
+        $h.className = syncState === "ok" ? "hint good" : "hint bad";
+        $h.textContent = syncState === "ok"
+          ? "Pushed " + items.length + " entries to the sheet."
+          : "That did not go through. Check the URL and token.";
+      });
+    }
+  });
+
+  $rows.addEventListener("click", function (e) {
+    var open = e.target.closest("[data-open]");
+    if (open) {
+      openId = openId === open.dataset.open ? null : open.dataset.open;
+      renderRows();
+      return;
+    }
+    var ed = e.target.closest("[data-edit]");
+    if (ed) {
+      editing = ed.dataset.edit;
+      openId = null;
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    var del = e.target.closest("[data-del]");
+    if (del) {
+      var it = items.filter(function (x) { return x.id === del.dataset.del; })[0];
+      if (!it) return;
+      if (!confirm("Delete the entry for " + (it.company || "this role") + "?")) return;
+      items = items.filter(function (x) { return x.id !== del.dataset.del; });
+      openId = null;
+      save();
+      render();
+      toast("Entry deleted.");
+    }
+  });
+
+  $rows.addEventListener("change", function (e) {
+    var sel = e.target.closest("[data-status]");
+    if (!sel) return;
+    var it = items.filter(function (x) { return x.id === sel.dataset.status; })[0];
+    if (!it) return;
+    it.status = sel.value;
+    if (it.status === "Saved") it.appliedDate = "";
+    else if (!it.appliedDate) it.appliedDate = isoToday();
+    save();
+    render();
+    toast("Status set to " + it.status + ".");
+  });
+
+  document.getElementById("exportCsv").addEventListener("click", function () {
+    if (!items.length) { toast("Nothing to export yet."); return; }
+    var cols = ["company", "role", "location", "source", "status", "appliedDate", "route", "referrer", "resume", "url", "notes", "jd"];
+    var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
+    var rows = [cols.join(",")].concat(items.map(function (it) {
+      return cols.map(function (c) { return q(it[c]); }).join(",");
+    }));
+    var blob = new Blob([rows.join("\r\n")], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "applications.csv";
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  });
+
+  load();
+})();
+</script>

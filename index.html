@@ -24,47 +24,31 @@
   * { box-sizing: border-box; }
 
   html, body {
-    margin: 0;
-    padding: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font);
-    font-size: 15px;
-    line-height: 1.45;
+    margin: 0; padding: 0;
+    background: var(--paper); color: var(--ink);
+    font-family: var(--font); font-size: 15px; line-height: 1.45;
     -webkit-font-smoothing: antialiased;
   }
 
   .wrap { max-width: 1060px; margin: 0 auto; padding: 28px 20px 64px; }
 
   .masthead {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding-bottom: 14px;
-    border-bottom: 2px solid var(--ink);
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; flex-wrap: wrap;
+    padding-bottom: 14px; border-bottom: 2px solid var(--ink);
   }
-
   .masthead h1 { font-size: 21px; font-weight: 600; letter-spacing: -0.015em; margin: 0; }
 
   .tally {
-    font-family: var(--font-narrow);
-    font-size: 14px;
-    color: var(--muted);
-    font-variant-numeric: tabular-nums;
+    font-family: var(--font-narrow); font-size: 14px;
+    color: var(--muted); font-variant-numeric: tabular-nums;
   }
-
   .tally b { color: var(--ink); font-weight: 600; }
   .tally .warn { color: var(--stale); }
 
   .sync-dot {
-    display: inline-block;
-    width: 7px; height: 7px;
-    border-radius: 50%;
-    margin-right: 5px;
-    vertical-align: 0;
-    background: var(--muted);
+    display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+    margin-right: 5px; background: var(--muted);
   }
   .sync-dot.ok { background: var(--fresh); }
   .sync-dot.bad { background: var(--stale); }
@@ -74,8 +58,7 @@
   button { font-family: var(--font); font-size: 14px; cursor: pointer; border-radius: 3px; }
 
   .btn-primary {
-    background: var(--accent); color: #F3F4EF;
-    border: 1px solid var(--accent);
+    background: var(--accent); color: #F3F4EF; border: 1px solid var(--accent);
     padding: 7px 14px; font-weight: 500;
   }
   .btn-primary:hover { background: #1B3049; }
@@ -90,9 +73,9 @@
 
   .search {
     flex: 1 1 200px; min-width: 160px;
-    font-family: var(--font); font-size: 14px;
-    padding: 7px 10px; background: var(--card);
-    border: 1px solid var(--rule); border-radius: 3px; color: var(--ink);
+    font-family: var(--font); font-size: 14px; padding: 7px 10px;
+    background: var(--card); border: 1px solid var(--rule);
+    border-radius: 3px; color: var(--ink);
   }
   .search::placeholder { color: var(--muted); }
 
@@ -109,15 +92,18 @@
     background: var(--card); font-weight: 600;
   }
 
+  .viewonly {
+    background: var(--card); border: 1px solid var(--rule);
+    border-left: 3px solid var(--accent); border-radius: 2px;
+    padding: 10px 14px; margin-bottom: 14px; font-size: 13.5px; color: var(--muted);
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 12px; flex-wrap: wrap;
+  }
+
   .heads {
-    display: grid;
-    grid-template-columns: 52px 1fr 132px 116px;
-    gap: 12px;
-    padding: 0 12px 6px 14px;
-    border-bottom: 1px solid var(--rule);
-    font-family: var(--font-narrow);
-    font-size: 12.5px;
-    color: var(--muted);
+    display: grid; grid-template-columns: 52px 1fr 132px 116px; gap: 12px;
+    padding: 0 12px 6px 14px; border-bottom: 1px solid var(--rule);
+    font-family: var(--font-narrow); font-size: 12.5px; color: var(--muted);
   }
   .heads span:first-child { text-align: right; }
 
@@ -130,24 +116,16 @@
   .row.age-stale { border-left-color: var(--stale); }
 
   .row-main {
-    display: grid;
-    grid-template-columns: 52px 1fr 132px 116px;
-    gap: 12px;
-    align-items: center;
-    width: 100%;
-    text-align: left;
-    background: transparent;
-    border: none;
-    padding: 11px;
-    font-family: var(--font);
-    color: var(--ink);
+    display: grid; grid-template-columns: 52px 1fr 132px 116px; gap: 12px;
+    align-items: center; width: 100%; text-align: left;
+    background: transparent; border: none; padding: 11px;
+    font-family: var(--font); color: var(--ink);
   }
   .row-main:hover { background: var(--card); }
   .row-main > * { min-width: 0; }
 
   .age {
-    text-align: right;
-    font-variant-numeric: tabular-nums;
+    text-align: right; font-variant-numeric: tabular-nums;
     font-size: 15px; font-weight: 600; color: var(--muted);
   }
   .age.fresh { color: var(--fresh); }
@@ -160,12 +138,10 @@
     font-weight: 600; font-size: 15px; letter-spacing: -0.01em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-
   .role {
     font-size: 13.5px; color: var(--muted);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-
   .source {
     font-family: var(--font-narrow); font-size: 13.5px; color: var(--muted);
     min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -203,7 +179,6 @@
     white-space: pre-wrap; font-size: 13.5px; line-height: 1.6;
     max-width: 74ch; overflow-wrap: anywhere;
   }
-
   .jd-empty { font-size: 13.5px; color: var(--muted); padding: 6px 0; }
 
   .notes {
@@ -234,7 +209,6 @@
     background: var(--paper); border: 1px solid var(--rule);
     border-radius: 2px; color: var(--ink); width: 100%;
   }
-
   textarea { resize: vertical; line-height: 1.55; min-height: 120px; }
   .paste-jd { min-height: 210px; }
 
@@ -245,18 +219,6 @@
   .hint.good { color: var(--fresh); }
 
   .prefill-note { font-size: 13px; color: var(--fresh); padding-bottom: 12px; margin-top: -6px; }
-
-  .nag {
-    background: #F6EEDC; border: 1px solid #D9C48E; border-left: 3px solid var(--aging);
-    border-radius: 2px; padding: 11px 14px; margin-bottom: 14px;
-    font-size: 13.5px; color: #6B4E12;
-    display: flex; justify-content: space-between; align-items: center;
-    gap: 12px; flex-wrap: wrap;
-  }
-  .nag button {
-    background: transparent; border: 1px solid #C9AE6E;
-    color: #6B4E12; padding: 5px 11px; font-size: 13px;
-  }
 
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 
@@ -305,15 +267,10 @@
     <div class="tally" id="tally"></div>
   </div>
 
-  <div class="toolbar">
-    <button class="btn-primary" id="pasteBtn">Paste a description</button>
-    <button class="btn-quiet" id="addBtn">Add manually</button>
-    <input class="search" id="search" type="search" placeholder="Search company, role, or JD text" aria-label="Search entries">
-    <div class="filters" id="filters"></div>
-  </div>
+  <div class="toolbar" id="toolbar"></div>
 
+  <div id="banner"></div>
   <div id="formHost"></div>
-  <div id="backupNag"></div>
 
   <div class="heads" id="heads">
     <span>Days</span>
@@ -330,12 +287,7 @@
       <span><i style="background:var(--aging)"></i>10 to 20 days</span>
       <span><i style="background:var(--stale)"></i>21 days or more</span>
     </div>
-    <div class="footer-actions">
-      <button class="btn-quiet" id="syncBtn">Sync settings</button>
-      <button class="btn-quiet" id="importBtn">Import</button>
-      <button class="btn-quiet" id="exportCsv">Export CSV</button>
-      <button class="btn-quiet" id="copyJson">Copy backup</button>
-    </div>
+    <div class="footer-actions" id="footerActions"></div>
   </div>
 
 </div>
@@ -346,33 +298,34 @@
 (function () {
   "use strict";
 
-  // ---------------------------------------------------------------
-  // Fill these in and every device that opens this page picks them up.
-  // The repo is public, so putting the URL here is fine but the TOKEN is
-  // readable by anyone who finds the repo. Leave DEFAULT_TOKEN empty unless
-  // the repo is private.
-  // ---------------------------------------------------------------
-  var DEFAULT_SYNC_URL = "";
-  var DEFAULT_TOKEN = "";
+  /* =========================================================
+     Settings. The only lines you would ever edit.
+     ========================================================= */
 
-  var LKEY = "tracker:applications";  // local cache
-  var BKEY = "tracker:lastbackup";
-  var AKEY = "tracker:apikey";
-  var SKEY = "tracker:sync";          // { url, token }
-  // Tried in order. Google retires models fairly often, so the first one that
-  // answers gets remembered and used from then on.
+  var SYNC_URL = "https://script.google.com/macros/s/AKfycbxl8Ervrcaenrz1Fa7oBIIWZ7igQSd_khuzUS43tGUamzL_walRYp2saLssOO3XMZ9B/exec";
+
+  // Read-only. Safe to have here in a public repo: it can look, never change.
+  var READ_TOKEN = "rd-5fb5ab7045";
+
+  /* ========================================================= */
+
+  var LKEY = "tracker:applications";
+  var WKEY = "tracker:write";        // the write password, typed per device
+  var AKEY = "tracker:apikey";       // Gemini key, typed per device
+  var MKEY = "tracker:geminimodel";
+
+  // Tried in order. Google retires models fairly often, so whichever answers
+  // first is remembered and used from then on.
   var GEMINI_MODELS = [
     "gemini-3.6-flash",
     "gemini-3.7-flash",
     "gemini-3.1-flash-lite",
     "gemini-2.5-flash"
   ];
-  var MKEY = "tracker:geminimodel";
 
   var STATUSES = ["Saved", "Applied", "Screening", "Interview", "Offer", "Rejected"];
   var ROUTES = ["Cold application", "Referral", "Recruiter reached out", "Campus"];
   var SOURCES = ["LinkedIn", "Careers page", "Naukri", "Instahyre", "From a person", "Campus portal", "Newsletter", "Other"];
-
   var LEGACY_SOURCE = {
     "ATS": "Careers page",
     "Company site": "Careers page",
@@ -382,28 +335,28 @@
   var AGEING = ["Applied", "Screening"];
 
   var items = [];
-  var lastBackup = null;
-  var syncState = "off"; // off, ok, bad
-  var dirty = false;     // a local change that has not reached the sheet
+  var syncState = "off";
+  var dirty = false;
   var filter = "All";
   var query = "";
   var openId = null;
   var editing = null;
   var pasting = false;
   var importing = false;
-  var syncing = false;
+  var unlocking = false;
   var draftSeed = null;
   var prefilled = false;
 
   var $rows = document.getElementById("rows");
   var $tally = document.getElementById("tally");
-  var $filters = document.getElementById("filters");
+  var $toolbar = document.getElementById("toolbar");
+  var $banner = document.getElementById("banner");
   var $formHost = document.getElementById("formHost");
   var $heads = document.getElementById("heads");
   var $toast = document.getElementById("toast");
-  var $nag = document.getElementById("backupNag");
+  var $footer = document.getElementById("footerActions");
 
-  /* ---------- small helpers ---------- */
+  /* ---------- helpers ---------- */
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -419,15 +372,10 @@
     } catch (e) { return null; }
   }
 
-  function syncConf() {
-    var saved = null;
-    try { saved = JSON.parse(local(SKEY) || "null"); } catch (e) {}
-    var url = (saved && saved.url) || DEFAULT_SYNC_URL;
-    var token = (saved && saved.token) || DEFAULT_TOKEN;
-    return url ? { url: url, token: token } : null;
-  }
-
+  function writeToken() { return local(WKEY) || ""; }
+  function canWrite() { return !!writeToken(); }
   function apiKey() { return local(AKEY) || ""; }
+  function activeToken() { return writeToken() || READ_TOKEN; }
 
   function today() {
     var d = new Date();
@@ -471,37 +419,65 @@
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
   }
 
-  /* ---------- storage ---------- */
-
-  // Older entries sometimes have the posting URL sitting in the source field, and use
-  // source labels that described the posting's host rather than where it was found.
+  /** Older entries put the posting URL in the source field. Move it where it belongs. */
   function tidy(list) {
     var changed = false;
     list.forEach(function (it) {
       var s = String(it.source || "").trim();
-
       if (/^https?:\/\//i.test(s)) {
         if (!it.url) it.url = s;
         it.source = "";
         s = "";
         changed = true;
       }
-
       if (s && LEGACY_SOURCE[s]) { it.source = LEGACY_SOURCE[s]; changed = true; }
       else if (s && SOURCES.indexOf(s) === -1) { it.source = "Other"; changed = true; }
     });
     return changed;
   }
 
-  function pullRemote(quiet) {
-    var conf = syncConf();
-    if (!conf || !conf.url) { syncState = "off"; render(); return Promise.resolve(); }
+  /** Tolerant of raw line breaks and separator characters pasted in from job boards. */
+  function safeParse(raw) {
+    try { return JSON.parse(raw); } catch (e) {}
 
-    return fetch(conf.url + "?token=" + encodeURIComponent(conf.token || "") + "&t=" + Date.now())
+    var out = "", inStr = false, esc2 = false;
+    for (var i = 0; i < raw.length; i++) {
+      var ch = raw[i], code = raw.charCodeAt(i);
+      if (esc2) { out += ch; esc2 = false; continue; }
+      if (inStr && ch === "\\") { out += ch; esc2 = true; continue; }
+      if (ch === '"') { inStr = !inStr; out += ch; continue; }
+      if (inStr && (code < 0x20 || code === 0x2028 || code === 0x2029)) {
+        if (ch === "\n") out += "\\n";
+        else if (ch === "\r") out += "\\r";
+        else if (ch === "\t") out += "\\t";
+        else out += "\\u" + ("000" + code.toString(16)).slice(-4);
+        continue;
+      }
+      out += ch;
+    }
+    try { return JSON.parse(out); } catch (e2) { return null; }
+  }
+
+  /* ---------- storage and sync ---------- */
+
+  function pullRemote(quiet) {
+    if (!SYNC_URL) { syncState = "off"; render(); return Promise.resolve(); }
+
+    return fetch(SYNC_URL + "?token=" + encodeURIComponent(activeToken()) + "&t=" + Date.now())
       .then(function (r) { return r.json(); })
       .then(function (data) {
         if (data.error) throw new Error(data.error);
         var next = Array.isArray(data.entries) ? data.entries : [];
+
+        // An empty sheet must never silently replace entries held locally. That is
+        // almost always a token or deployment problem, not a real deletion.
+        if (!next.length && items.length) {
+          syncState = "bad";
+          renderTally();
+          toast("The sheet came back empty. Keeping the " + items.length + " entries on this device.");
+          return;
+        }
+
         var fixed = tidy(next);
         var before = JSON.stringify(items);
 
@@ -516,7 +492,7 @@
         } else {
           renderTally();
         }
-        if (fixed) save();
+        if (fixed && canWrite()) save();
       })
       .catch(function () {
         syncState = "bad";
@@ -527,31 +503,23 @@
 
   function load() {
     $rows.innerHTML = '<div class="empty">Loading.</div>';
-
-    try {
-      items = JSON.parse(local(LKEY) || "[]");
-    } catch (e) { items = []; }
+    try { items = JSON.parse(local(LKEY) || "[]"); } catch (e) { items = []; }
     if (!Array.isArray(items)) items = [];
     tidy(items);
-
-    lastBackup = Number(local(BKEY)) || null;
     render();
-
-    var conf = syncConf();
-    if (!conf || !conf.url) { syncState = "off"; render(); return; }
     pullRemote(false);
   }
 
   function save() {
     local(LKEY, JSON.stringify(items));
 
-    var conf = syncConf();
-    if (!conf || !conf.url) { syncState = "off"; return Promise.resolve(); }
+    if (!canWrite()) return Promise.resolve();
+    if (!SYNC_URL) { syncState = "off"; return Promise.resolve(); }
 
-    return fetch(conf.url, {
+    return fetch(SYNC_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ token: conf.token || "", entries: items })
+      body: JSON.stringify({ token: writeToken(), entries: items })
     })
       .then(function (r) { return r.json(); })
       .then(function (data) {
@@ -601,7 +569,7 @@
     var stale = waiting.filter(function (it) { return (daysSince(it.appliedDate) || 0) >= 21; }).length;
 
     var dot = syncState === "ok" ? "ok" : (syncState === "bad" ? "bad" : "");
-    var label = syncState === "ok" ? "Synced" : (syncState === "bad" ? "Not synced" : "This device only");
+    var label = syncState === "ok" ? "Synced" : (syncState === "bad" ? "Not synced" : "Local");
 
     var parts = ["<b>" + items.length + "</b> logged", "<b>" + waiting.length + "</b> awaiting a reply"];
     if (stale) parts.push('<span class="warn"><b>' + stale + "</b> past three weeks</span>");
@@ -609,19 +577,33 @@
     $tally.innerHTML = parts.join(", ");
   }
 
-  function renderNag() {
-    if (syncConf() || items.length < 3) { $nag.innerHTML = ""; return; }
-    var days = lastBackup ? Math.floor((Date.now() - lastBackup) / 86400000) : null;
-    if (days !== null && days < 14) { $nag.innerHTML = ""; return; }
-    $nag.innerHTML = '<div class="nag"><span>' +
-      (days === null ? "Nothing is backed up yet, and sync is off." : "Last backup was " + days + " days ago.") +
-      '</span><button id="nagCopy">Copy backup</button></div>';
+  function renderToolbar() {
+    $toolbar.innerHTML =
+      (canWrite()
+        ? '<button class="btn-primary" id="pasteBtn">Paste a description</button>' +
+          '<button class="btn-quiet" id="addBtn">Add manually</button>'
+        : "") +
+      '<input class="search" id="search" type="search" placeholder="Search company, role, or description" aria-label="Search entries" value="' + esc(query) + '">' +
+      '<div class="filters" id="filters"></div>';
+
+    $footer.innerHTML = canWrite()
+      ? '<button class="btn-quiet" id="importBtn">Import</button>' +
+        '<button class="btn-quiet" id="exportCsv">Export CSV</button>' +
+        '<button class="btn-quiet" id="copyJson">Copy backup</button>'
+      : '<button class="btn-quiet" id="unlockBtn">Unlock editing</button>';
+
+    $banner.innerHTML = canWrite()
+      ? ""
+      : '<div class="viewonly"><span>View only. You can read everything here, but not change it.</span>' +
+        '<button class="btn-quiet" id="unlockBtn2">Unlock editing</button></div>';
   }
 
   function renderFilters() {
+    var el = document.getElementById("filters");
+    if (!el) return;
     var counts = {};
     items.forEach(function (it) { counts[it.status] = (counts[it.status] || 0) + 1; });
-    $filters.innerHTML = ["All"].concat(STATUSES).map(function (t) {
+    el.innerHTML = ["All"].concat(STATUSES).map(function (t) {
       var n = t === "All" ? items.length : (counts[t] || 0);
       if (t !== "All" && !n) return "";
       return '<button class="chip" data-filter="' + t + '" aria-pressed="' + (filter === t) + '">' + esc(t) + " " + n + "</button>";
@@ -633,7 +615,8 @@
 
     if (!items.length) {
       $heads.hidden = true;
-      $rows.innerHTML = '<div class="empty"><b>Nothing logged yet.</b>Paste a job description to start building the record.</div>';
+      $rows.innerHTML = '<div class="empty"><b>Nothing logged yet.</b>' +
+        (canWrite() ? "Paste a job description to start building the record." : "") + "</div>";
       return;
     }
     if (!list.length) {
@@ -673,15 +656,18 @@
           "</div>" +
           (it.jd ? '<div class="jd">' + esc(it.jd) + "</div>" : '<div class="jd-empty">No description saved.</div>') +
           (it.notes ? '<div class="notes">' + esc(it.notes) + "</div>" : "") +
-          '<div class="detail-actions">' +
-            '<select class="search" style="flex:0 0 auto;width:auto" data-status="' + esc(it.id) + '" aria-label="Change status">' +
-              STATUSES.map(function (s) {
-                return '<option value="' + s + '"' + (s === it.status ? " selected" : "") + ">" + s + "</option>";
-              }).join("") +
-            "</select>" +
-            '<button class="btn-quiet" data-edit="' + esc(it.id) + '">Edit</button>' +
-            '<button class="btn-quiet btn-danger" data-del="' + esc(it.id) + '">Delete</button>' +
-          "</div></div>";
+          (canWrite()
+            ? '<div class="detail-actions">' +
+                '<select class="search" style="flex:0 0 auto;width:auto" data-status="' + esc(it.id) + '" aria-label="Change status">' +
+                  STATUSES.map(function (s) {
+                    return '<option value="' + s + '"' + (s === it.status ? " selected" : "") + ">" + s + "</option>";
+                  }).join("") +
+                "</select>" +
+                '<button class="btn-quiet" data-edit="' + esc(it.id) + '">Edit</button>' +
+                '<button class="btn-quiet btn-danger" data-del="' + esc(it.id) + '">Delete</button>' +
+              "</div>"
+            : "") +
+          "</div>";
       }
 
       return html + "</div>";
@@ -693,37 +679,37 @@
       '<input id="f-' + id + '" value="' + esc(val || "") + '"' + (hint ? ' placeholder="' + esc(hint) + '"' : "") + "></div>";
   }
 
+  function renderUnlock() {
+    $formHost.innerHTML = '<div class="form"><h2>Unlock editing</h2>' +
+      '<div class="field wide"><label for="u-pw">Write password</label>' +
+        '<input id="u-pw" type="password" placeholder="Your write password">' +
+        '<span class="hint">Stored in this browser, so you only do this once per device.</span></div>' +
+      '<div class="form-actions">' +
+        '<button class="btn-primary" id="doUnlock">Unlock</button>' +
+        '<button class="btn-quiet" id="cancelPanel">Cancel</button>' +
+        '<span class="hint" id="unlockHint"></span>' +
+      "</div></div>";
+    var el = document.getElementById("u-pw");
+    if (el) el.focus();
+  }
+
   function renderPaste() {
     var hasKey = !!apiKey();
     $formHost.innerHTML = '<div class="form"><h2>Paste the description</h2>' +
       '<div class="field wide"><textarea id="p-jd" class="paste-jd" placeholder="Paste the whole posting. Company, role, location and posting date get read out of it."></textarea></div>' +
-      (hasKey ? "" :
-        '<div class="field wide" style="padding-top:12px"><label for="p-key">Gemini API key</label>' +
-        '<input id="p-key" type="password" placeholder="AIza...">' +
-        '<span class="hint">Free from Google AI Studio, no card needed. Saved in this browser only, never in the file. Skip it and use Add manually instead.</span></div>') +
+      (hasKey
+        ? '<div class="form-actions" style="padding-top:12px"><span class="hint">A Gemini key is saved in this browser.</span>' +
+          '<button class="btn-quiet" id="clearKey">Use a different key</button></div>'
+        : '<div class="field wide" style="padding-top:12px"><label for="p-key">Gemini API key</label>' +
+          '<input id="p-key" type="password" placeholder="AQ.Ab8...">' +
+          '<span class="hint">Free from aistudio.google.com. New keys start with AQ. Older AIza keys also work. Saved in this browser only, never in the file.</span></div>') +
       '<div class="form-actions">' +
         '<button class="btn-primary" id="readJd">Read the description</button>' +
-        '<button class="btn-quiet" id="cancelPaste">Cancel</button>' +
+        '<button class="btn-quiet" id="cancelPanel">Cancel</button>' +
         '<span class="hint" id="pasteHint">You check everything before it saves.</span>' +
       "</div></div>";
     var ta = document.getElementById("p-jd");
     if (ta) ta.focus();
-  }
-
-  function renderSync() {
-    var conf = syncConf() || { url: "", token: "" };
-    $formHost.innerHTML = '<div class="form"><h2>Sync settings</h2>' +
-      '<div class="field wide"><label for="s-url">Apps Script web app URL</label>' +
-        '<input id="s-url" type="url" value="' + esc(conf.url) + '" placeholder="https://script.google.com/macros/s/.../exec"></div>' +
-      '<div class="field wide"><label for="s-token">Token</label>' +
-        '<input id="s-token" value="' + esc(conf.token) + '" placeholder="The TOKEN value from Code.gs"></div>' +
-      '<div class="form-actions">' +
-        '<button class="btn-primary" id="saveSync">Save and pull</button>' +
-        '<button class="btn-quiet" id="pushSync">Push this device up</button>' +
-        '<button class="btn-quiet" id="cancelImport">Close</button>' +
-      "</div>" +
-      '<div class="hint" id="syncHint" style="padding-top:10px">Save and pull replaces what is here with the sheet. Push sends this device up, overwriting the sheet.</div>' +
-      "</div>";
   }
 
   function renderImport() {
@@ -731,7 +717,7 @@
       '<div class="field wide"><textarea id="i-json" class="paste-jd" placeholder="Paste a backup here."></textarea></div>' +
       '<div class="form-actions">' +
         '<button class="btn-primary" id="runImport">Import</button>' +
-        '<button class="btn-quiet" id="cancelImport">Cancel</button>' +
+        '<button class="btn-quiet" id="cancelPanel">Cancel</button>' +
         '<span class="hint" id="importHint">Entries are added to what is already here. Nothing gets overwritten.</span>' +
       "</div></div>";
     var ta = document.getElementById("i-json");
@@ -739,7 +725,7 @@
   }
 
   function renderForm() {
-    if (syncing) { renderSync(); return; }
+    if (unlocking) { renderUnlock(); return; }
     if (importing) { renderImport(); return; }
     if (pasting) { renderPaste(); return; }
     if (!editing) { $formHost.innerHTML = ""; return; }
@@ -786,7 +772,7 @@
       "</div>" +
       '<div class="form-actions">' +
         '<button class="btn-primary" id="saveEntry">Save entry</button>' +
-        '<button class="btn-quiet" id="cancelEntry">Cancel</button>' +
+        '<button class="btn-quiet" id="cancelPanel">Cancel</button>' +
         '<span class="hint">Company is the only field required.</span>' +
       "</div></div>";
 
@@ -796,7 +782,7 @@
 
   function render() {
     renderTally();
-    renderNag();
+    renderToolbar();
     renderFilters();
     renderForm();
     renderRows();
@@ -840,28 +826,49 @@
       "digest: one sentence under 25 words on what the job involves day to day.\n" +
       'Use "" for anything the posting does not state. Do not guess.\n\nPOSTING:\n' + text;
 
-    function callModel(model) {
-      return fetch("https://generativelanguage.googleapis.com/v1beta/models/" + model +
-                   ":generateContent?key=" + encodeURIComponent(apiKey()), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: instruction }] }],
-          generationConfig: { responseMimeType: "application/json", temperature: 0 }
-        })
-      }).then(function (r) {
-        return r.json().then(function (data) {
-          if (data.error) {
-            var err = new Error(data.error.message || "request failed");
-            err.status = data.error.status || r.status;
-            throw err;
-          }
-          return data;
-        });
+    var ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/";
+
+    function body() {
+      return JSON.stringify({
+        contents: [{ parts: [{ text: instruction }] }],
+        generationConfig: { responseMimeType: "application/json", temperature: 0 }
       });
     }
 
-    // Start with whichever model worked last time, then fall through the rest.
+    function unwrap(r) {
+      return r.json().then(function (data) {
+        if (data.error) {
+          var err = new Error(data.error.message || "request failed");
+          err.status = data.error.status || r.status;
+          throw err;
+        }
+        return data;
+      });
+    }
+
+    // AQ. authentication keys have to travel in the x-goog-api-key header. The older
+    // AIza traffic keys work either way, so the header is tried first and the legacy
+    // query parameter is only used if the browser blocks the preflight.
+    function callModel(model) {
+      return fetch(ENDPOINT + model + ":generateContent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": apiKey()
+        },
+        body: body()
+      })
+        .then(unwrap)
+        .catch(function (e) {
+          if (!/Failed to fetch|NetworkError|CORS/i.test(String(e && e.message))) throw e;
+          return fetch(ENDPOINT + model + ":generateContent?key=" + encodeURIComponent(apiKey()), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: body()
+          }).then(unwrap);
+        });
+    }
+
     var remembered = local(MKEY);
     var queue = remembered
       ? [remembered].concat(GEMINI_MODELS.filter(function (m) { return m !== remembered; }))
@@ -872,7 +879,6 @@
       return callModel(queue[i])
         .then(function (data) { local(MKEY, queue[i]); return data; })
         .catch(function (e) {
-          // A missing model means try the next one. Anything else is a real problem.
           var missing = e.status === 404 || e.status === "NOT_FOUND" ||
                         /not found|not supported|does not exist/i.test(e.message || "");
           if (!missing) throw e;
@@ -896,7 +902,7 @@
           company: parsed.company || "",
           role: parsed.role || "",
           location: parsed.location || "",
-          source: "", url: "", status: "Saved", appliedDate: "",
+          source: "LinkedIn", url: "", status: "Saved", appliedDate: "",
           jd: text, notes: note.trim()
         };
 
@@ -912,8 +918,8 @@
         $hint.className = "hint bad";
 
         var msg = String((e && e.message) || "");
-        if (/API key not valid|API_KEY_INVALID/i.test(msg)) {
-          $hint.textContent = "That key was rejected. Check you copied the whole thing from AI Studio.";
+        if (/API key not valid|API_KEY_INVALID|UNAUTHENTICATED|ACCESS_TOKEN_TYPE_UNSUPPORTED|api key/i.test(msg)) {
+          $hint.textContent = "That key was rejected. Copy it again from AI Studio, or make a new one.";
           try { localStorage.removeItem(AKEY); } catch (ignore) {}
         } else if (/quota|RESOURCE_EXHAUSTED|rate/i.test(msg)) {
           $hint.textContent = "Rate limited by Google. Wait a minute and try again.";
@@ -934,7 +940,6 @@
     var company = v("company");
     if (!company) { toast("Add a company name to save this entry."); document.getElementById("f-company").focus(); return; }
 
-    var url = v("url");
     var data = {
       company: company,
       role: v("role"),
@@ -945,7 +950,7 @@
       route: document.getElementById("f-route").value,
       referrer: v("referrer"),
       resume: v("resume"),
-      url: url,
+      url: v("url"),
       jd: document.getElementById("f-jd").value.trim(),
       notes: v("notes")
     };
@@ -975,45 +980,15 @@
     render();
   }
 
-  function safeParse(raw) {
-    try { return JSON.parse(raw); } catch (e) {}
-
-    // Some job boards paste in raw line breaks and separator characters that end up
-    // unescaped inside string values. Escape them, then try again.
-    var out = "", inStr = false, esc = false;
-    for (var i = 0; i < raw.length; i++) {
-      var ch = raw[i];
-      var code = raw.charCodeAt(i);
-
-      if (esc) { out += ch; esc = false; continue; }
-      if (inStr && ch === "\\") { out += ch; esc = true; continue; }
-      if (ch === '"') { inStr = !inStr; out += ch; continue; }
-
-      if (inStr && (code < 0x20 || code === 0x2028 || code === 0x2029)) {
-        if (ch === "\n") out += "\\n";
-        else if (ch === "\r") out += "\\r";
-        else if (ch === "\t") out += "\\t";
-        else out += "\\u" + ("000" + code.toString(16)).slice(-4);
-        continue;
-      }
-
-      out += ch;
-    }
-
-    try { return JSON.parse(out); } catch (e2) { return null; }
-  }
-
   function runImport() {
     var $hint = document.getElementById("importHint");
-    var raw = (document.getElementById("i-json").value || "").trim();
-    var incoming = safeParse(raw);
+    var incoming = safeParse((document.getElementById("i-json").value || "").trim());
 
     if (incoming === null) {
       $hint.className = "hint bad";
       $hint.textContent = "Could not read that. Check it starts with { and ends with }.";
       return;
     }
-
     if (incoming && !Array.isArray(incoming) && Array.isArray(incoming.entries)) incoming = incoming.entries;
     if (!Array.isArray(incoming)) {
       $hint.className = "hint bad";
@@ -1035,6 +1010,7 @@
       it.createdAt = it.createdAt || Date.now();
       it.status = STATUSES.indexOf(it.status) > -1 ? it.status : "Saved";
       delete it.resumeUrl;
+      delete it.resumes;
       items.push(it);
       have[it.id] = true;
       added++;
@@ -1047,16 +1023,11 @@
     toast(added ? "Imported " + added + (added === 1 ? " entry." : " entries.") : "Nothing new to import.");
   }
 
-  function markBackedUp() {
-    lastBackup = Date.now();
-    local(BKEY, String(lastBackup));
-  }
-
   function showCopyBox(payload) {
     $formHost.innerHTML = '<div class="form"><h2>Your backup</h2>' +
       '<div class="field wide"><textarea id="c-json" class="paste-jd"></textarea>' +
       '<span class="hint">Select all, copy, and paste it into a text file.</span></div>' +
-      '<div class="form-actions"><button class="btn-quiet" id="cancelImport">Close</button></div></div>';
+      '<div class="form-actions"><button class="btn-quiet" id="cancelPanel">Close</button></div></div>';
     var t = document.getElementById("c-json");
     t.value = payload;
     t.focus();
@@ -1069,59 +1040,60 @@
     var payload = JSON.stringify({ entries: items })
       .replace(/\u2028/g, "\\u2028")
       .replace(/\u2029/g, "\\u2029");
-    markBackedUp();
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(payload)
-        .then(function () { toast("Copied."); render(); })
+        .then(function () { toast("Copied."); })
         .catch(function () { showCopyBox(payload); });
     } else {
       showCopyBox(payload);
     }
   }
 
+  function exportCsv() {
+    if (!items.length) { toast("Nothing to export yet."); return; }
+    var cols = ["company", "role", "location", "status", "appliedDate", "source", "route", "referrer", "resume", "url", "notes", "jd"];
+    var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
+    var rows = [cols.join(",")].concat(items.map(function (it) {
+      return cols.map(function (c) { return q(it[c]); }).join(",");
+    }));
+    var blob = new Blob([rows.join("\r\n")], { type: "text/csv" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "applications.csv";
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  function closePanels() {
+    editing = null; pasting = false; importing = false; unlocking = false;
+    draftSeed = null; prefilled = false;
+  }
+
   /* ---------- wiring ---------- */
 
-  document.getElementById("pasteBtn").addEventListener("click", function () {
-    pasting = true; importing = false; syncing = false;
-    editing = null; draftSeed = null; prefilled = false; openId = null;
-    render();
+  $toolbar.addEventListener("click", function (e) {
+    var id = e.target.id;
+    if (id === "pasteBtn") { closePanels(); pasting = true; openId = null; render(); }
+    if (id === "addBtn") { closePanels(); editing = "new"; openId = null; render(); }
+
+    var chip = e.target.closest("[data-filter]");
+    if (chip) { filter = chip.dataset.filter; renderFilters(); renderRows(); }
   });
 
-  document.getElementById("addBtn").addEventListener("click", function () {
-    pasting = false; importing = false; syncing = false;
-    draftSeed = null; prefilled = false; editing = "new"; openId = null;
-    render();
+  $toolbar.addEventListener("input", function (e) {
+    if (e.target.id === "search") { query = e.target.value; renderRows(); }
   });
 
-  document.getElementById("importBtn").addEventListener("click", function () {
-    importing = true; pasting = false; syncing = false; editing = null; openId = null;
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  $footer.addEventListener("click", function (e) {
+    var id = e.target.id;
+    if (id === "importBtn") { closePanels(); importing = true; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+    if (id === "exportCsv") exportCsv();
+    if (id === "copyJson") doCopy();
+    if (id === "unlockBtn") { closePanels(); unlocking = true; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
   });
 
-  document.getElementById("syncBtn").addEventListener("click", function () {
-    syncing = true; importing = false; pasting = false; editing = null; openId = null;
-    render();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  });
-
-  document.getElementById("copyJson").addEventListener("click", doCopy);
-
-  $nag.addEventListener("click", function (e) {
-    if (e.target.id === "nagCopy") doCopy();
-  });
-
-  document.getElementById("search").addEventListener("input", function (e) {
-    query = e.target.value;
-    renderRows();
-  });
-
-  $filters.addEventListener("click", function (e) {
-    var b = e.target.closest("[data-filter]");
-    if (!b) return;
-    filter = b.dataset.filter;
-    renderFilters();
-    renderRows();
+  $banner.addEventListener("click", function (e) {
+    if (e.target.id === "unlockBtn2") { closePanels(); unlocking = true; render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
   });
 
   $formHost.addEventListener("click", function (e) {
@@ -1129,37 +1101,50 @@
     if (id === "saveEntry") commit();
     if (id === "readJd") readDescription();
     if (id === "runImport") runImport();
-    if (id === "cancelPaste") { pasting = false; render(); }
-    if (id === "cancelImport") { importing = false; syncing = false; render(); }
-    if (id === "cancelEntry") { editing = null; draftSeed = null; prefilled = false; render(); }
+    if (id === "cancelPanel") { closePanels(); render(); }
 
-    if (id === "saveSync") {
-      var conf = {
-        url: document.getElementById("s-url").value.trim(),
-        token: document.getElementById("s-token").value.trim()
-      };
-      local(SKEY, JSON.stringify(conf));
-      syncing = false;
-      load();
-      toast("Sync saved. Pulling from the sheet.");
+    if (id === "clearKey") {
+      try { localStorage.removeItem(AKEY); } catch (ignore) {}
+      var kept = document.getElementById("p-jd");
+      var text = kept ? kept.value : "";
+      renderPaste();
+      var back = document.getElementById("p-jd");
+      if (back) back.value = text;
+      var box = document.getElementById("p-key");
+      if (box) box.focus();
     }
 
-    if (id === "pushSync") {
-      var $h = document.getElementById("syncHint");
-      var c = {
-        url: document.getElementById("s-url").value.trim(),
-        token: document.getElementById("s-token").value.trim()
-      };
-      if (!c.url) { $h.className = "hint bad"; $h.textContent = "Add the web app URL first."; return; }
-      local(SKEY, JSON.stringify(c));
+    if (id === "doUnlock") {
+      var pw = document.getElementById("u-pw").value.trim();
+      var $h = document.getElementById("unlockHint");
+      if (!pw) { $h.className = "hint bad"; $h.textContent = "Enter the password."; return; }
+
       $h.className = "hint";
-      $h.textContent = "Pushing.";
-      save().then(function () {
-        $h.className = syncState === "ok" ? "hint good" : "hint bad";
-        $h.textContent = syncState === "ok"
-          ? "Pushed " + items.length + " entries to the sheet."
-          : "That did not go through. Check the URL and token.";
-      });
+      $h.textContent = "Checking.";
+
+      // A write with the current list is the honest test: it either lands or is refused.
+      fetch(SYNC_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ token: pw, entries: items })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.error) {
+            $h.className = "hint bad";
+            $h.textContent = "That password was not accepted.";
+            return;
+          }
+          local(WKEY, pw);
+          closePanels();
+          syncState = "ok";
+          render();
+          toast("Editing unlocked on this device.");
+        })
+        .catch(function () {
+          $h.className = "hint bad";
+          $h.textContent = "Could not reach the sheet. Check your connection.";
+        });
     }
   });
 
@@ -1170,8 +1155,11 @@
       renderRows();
       return;
     }
+    if (!canWrite()) return;
+
     var ed = e.target.closest("[data-edit]");
     if (ed) {
+      closePanels();
       editing = ed.dataset.edit;
       openId = null;
       render();
@@ -1192,6 +1180,7 @@
   });
 
   $rows.addEventListener("change", function (e) {
+    if (!canWrite()) return;
     var sel = e.target.closest("[data-status]");
     if (!sel) return;
     var it = items.filter(function (x) { return x.id === sel.dataset.status; })[0];
@@ -1204,42 +1193,25 @@
     toast("Status set to " + it.status + ".");
   });
 
-  document.getElementById("exportCsv").addEventListener("click", function () {
-    if (!items.length) { toast("Nothing to export yet."); return; }
-    var cols = ["company", "role", "location", "source", "status", "appliedDate", "route", "referrer", "resume", "url", "notes", "jd"];
-    var q = function (s) { return '"' + String(s == null ? "" : s).replace(/"/g, '""') + '"'; };
-    var rows = [cols.join(",")].concat(items.map(function (it) {
-      return cols.map(function (c) { return q(it[c]); }).join(",");
-    }));
-    var blob = new Blob([rows.join("\r\n")], { type: "text/csv" });
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "applications.csv";
-    a.click();
-    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
-  });
-
   /* ---------- keeping in step with the sheet ---------- */
 
   // A pull replaces everything on screen, so never run one while a panel is open
-  // and half filled in. Those moments are skipped and picked up on the next tick.
+  // and half filled in. Those ticks are skipped and picked up on the next one.
   function busy() {
-    return editing !== null || pasting || importing || syncing;
+    return editing !== null || pasting || importing || unlocking;
   }
 
   function refresh() {
-    if (!syncConf() || busy()) return;
+    if (!SYNC_URL || busy()) return;
     if (document.visibilityState === "hidden") return;
-    if (dirty) { save(); return; }
+    if (dirty && canWrite()) { save(); return; }
     pullRemote(true);
   }
 
   setInterval(refresh, 120000);
-
   document.addEventListener("visibilitychange", function () {
     if (document.visibilityState === "visible") refresh();
   });
-
   window.addEventListener("online", refresh);
 
   load();
